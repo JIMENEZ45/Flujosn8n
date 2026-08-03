@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Flow Center // Núcleo de Automatizaciones",
-  description: "Interfaz futurista para ejecutar y monitorear flujos de n8n.",
+  title: "Equipo de Cargue // Centro de Automatizaciones",
+  description: "Centro de automatizaciones del Equipo de Cargue. Ejecuta y monitorea flujos de n8n.",
 };
 
 export const viewport: Viewport = {

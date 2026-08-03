@@ -7,8 +7,9 @@ export const maxDuration = 60;
 
 const webhookMap: Record<string, string | undefined> = {
   "aut-tests": process.env.N8N_WEBHOOK_AUT_TESTS,
-  "course-resources": process.env.N8N_WEBHOOK_COURSE_RESOURCES,
-  "compare-documents": process.env.N8N_WEBHOOK_COMPARE_DOCUMENTS,
+  "descargar-recursos": process.env.N8N_WEBHOOK_DESCARGAR_RECURSOS,
+  "matriz-csv": process.env.N8N_WEBHOOK_MATRIZ_CSV,
+  "plantillas-tematicas": process.env.N8N_WEBHOOK_PLANTILLAS,
 };
 
 type JsonRecord = Record<string, unknown>;

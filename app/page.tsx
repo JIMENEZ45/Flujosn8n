@@ -3,8 +3,9 @@
 import {
   ArrowUpRight,
   FileJson,
-  FileSearch,
-  FolderCog,
+  FileSpreadsheet,
+  FolderDown,
+  LayoutTemplate,
   LoaderCircle,
   Play,
   Search,
@@ -17,8 +18,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 type Field = {
   key: string;
   label: string;
-  placeholder: string;
-  type?: "text" | "url" | "number";
+  placeholder?: string;
+  type?: "text" | "url" | "number" | "select";
+  /** Solo para type "select". */
+  options?: string[];
+  defaultValue?: string;
+  hint?: string;
 };
 
 type Flow = {
@@ -50,40 +55,78 @@ const flows: Flow[] = [
     ],
   },
   {
-    id: "course-resources",
+    id: "descargar-recursos",
     code: "NX-002",
-    name: "Procesar recursos",
-    description: "Organiza y clasifica los recursos de un curso alojados en Google Drive.",
-    category: "Cursos",
-    icon: FolderCog,
+    name: "Descarga de recursos",
+    description:
+      "Descarga los recursos listados en una hoja de Google Sheets, con opción de dividirlos por unidad.",
+    category: "Recursos",
+    icon: FolderDown,
     fields: [
       {
-        key: "folderUrl",
-        label: "Carpeta de Google Drive",
-        placeholder: "https://drive.google.com/drive/folders/...",
+        key: "sheetUrl",
+        label: "URL de la hoja (Google Sheet)",
+        placeholder: "https://docs.google.com/spreadsheets/d/.../edit",
+        type: "url",
+        hint: "Cópiala y pégala tal cual desde la barra del navegador.",
+      },
+      {
+        key: "dividirPorUnidad",
+        label: "Dividir recursos por unidad",
+        type: "select",
+        options: ["Si", "No"],
+        defaultValue: "Si",
+        hint: "Este proceso puede tardar varios minutos.",
+      },
+    ],
+  },
+  {
+    id: "matriz-csv",
+    code: "NX-003",
+    name: "Matriz de importación CSV",
+    description:
+      "Genera la matriz de importación a partir de la plantilla de la asignatura y sus códigos.",
+    category: "Matrices",
+    icon: FileSpreadsheet,
+    fields: [
+      {
+        key: "codigos",
+        label: "Código Programa (PR) + Pensum (PS) + Asignatura (AS)",
+        placeholder: "PR PS AS Nombre de la asignatura",
+        type: "text",
+        hint: "Pega los códigos en ese orden, seguidos del nombre de la asignatura.",
+      },
+      {
+        key: "filaInicio",
+        label: "Fila desde la que inicia la tabla",
+        type: "select",
+        options: ["3", "4", "5", "6", "7"],
+        defaultValue: "5",
+        hint: "Por defecto la plantilla inicia en la fila 5.",
+      },
+      {
+        key: "plantillaUrl",
+        label: "URL de la plantilla de la asignatura",
+        placeholder: "https://docs.google.com/spreadsheets/d/...",
         type: "url",
       },
     ],
   },
   {
-    id: "compare-documents",
-    code: "NX-003",
-    name: "Comparar documentos",
-    description: "Contrasta la Plantilla Temática con el Diseño Instruccional y reporta diferencias.",
-    category: "Validación",
-    icon: FileSearch,
+    id: "plantillas-tematicas",
+    code: "NX-004",
+    name: "Generador de plantillas temáticas",
+    description:
+      "Crea las plantillas temáticas a partir de una carpeta principal de Google Drive.",
+    category: "Plantillas",
+    icon: LayoutTemplate,
     fields: [
       {
-        key: "templateUrl",
-        label: "Enlace de la Plantilla Temática",
-        placeholder: "https://docs.google.com/document/d/...",
+        key: "folderUrl",
+        label: "Link de la carpeta principal",
+        placeholder: "https://drive.google.com/drive/folders/1ABC123xyz",
         type: "url",
-      },
-      {
-        key: "designUrl",
-        label: "Enlace del Diseño Instruccional",
-        placeholder: "https://docs.google.com/document/d/...",
-        type: "url",
+        hint: "Solo la carpeta principal, no una subcarpeta.",
       },
     ],
   },
@@ -217,8 +260,8 @@ export default function Home() {
               <Terminal size={20} />
             </span>
             <span>
-              <span className="brand-name">Flow Center</span>
-              <span className="brand-sub">n8n control node</span>
+              <span className="brand-name">Equipo de Cargue</span>
+              <span className="brand-sub">Centro de automatizaciones</span>
             </span>
           </div>
 
@@ -318,7 +361,7 @@ export default function Home() {
           </div>
         )}
 
-        <p className="footer-note">Flow Center · Interfaz de control para n8n</p>
+        <p className="footer-note">Equipo de Cargue · Interfaz de control para n8n</p>
       </div>
 
       {selectedFlow && (
@@ -353,13 +396,30 @@ export default function Home() {
               {selectedFlow.fields.map((field) => (
                 <label key={field.key}>
                   <span>{field.label}</span>
-                  <input
-                    name={field.key}
-                    type={field.type || "text"}
-                    placeholder={field.placeholder}
-                    autoComplete="off"
-                    required
-                  />
+
+                  {field.type === "select" ? (
+                    <select
+                      name={field.key}
+                      defaultValue={field.defaultValue || field.options?.[0]}
+                      required
+                    >
+                      {(field.options || []).map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      name={field.key}
+                      type={field.type || "text"}
+                      placeholder={field.placeholder}
+                      autoComplete="off"
+                      required
+                    />
+                  )}
+
+                  {field.hint && <small className="field-hint">{field.hint}</small>}
                 </label>
               ))}
 
