@@ -139,6 +139,15 @@ const flows: Flow[] = [
   },
 ];
 
+/**
+ * Flujos que el navegador llama directamente al webhook de n8n, saltándose
+ * la función de Vercel y su límite de 60 s. Requiere que el nodo Webhook
+ * tenga CORS habilitado (Options → Allowed Origins).
+ */
+const directWebhooks: Record<string, string | undefined> = {
+  "descargar-recursos": process.env.NEXT_PUBLIC_N8N_DESCARGAR_RECURSOS,
+};
+
 type ExecutionResult = {
   ok?: boolean;
   demo?: boolean;
@@ -152,6 +161,7 @@ export default function Home() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [clock, setClock] = useState("--:--:--");
+  const [elapsed, setElapsed] = useState(0);
 
   // Reloj HUD (solo en cliente para evitar errores de hidratación)
   useEffect(() => {
@@ -160,6 +170,14 @@ export default function Home() {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
+
+  // Cronómetro visible mientras corre un flujo largo
+  useEffect(() => {
+    if (!submitting) return;
+    setElapsed(0);
+    const id = setInterval(() => setElapsed((value) => value + 1), 1000);
+    return () => clearInterval(id);
+  }, [submitting]);
 
   const filteredFlows = useMemo(() => {
     const value = query.trim().toLowerCase();
@@ -214,12 +232,20 @@ export default function Home() {
       payload[key] = typeof value === "string" ? value.trim() : "";
     });
 
+    const directUrl = directWebhooks[selectedFlow.id];
+
     try {
-      const response = await fetch("/api/execute", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ flowId: selectedFlow.id, payload }),
-      });
+      const response = directUrl
+        ? await fetch(directUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+        : await fetch("/api/execute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ flowId: selectedFlow.id, payload }),
+          });
 
       let responseData: ExecutionResult;
 
@@ -233,7 +259,12 @@ export default function Home() {
         throw new Error(responseData.message || "No se pudo ejecutar la automatización.");
       }
 
-      setResult(responseData);
+      // Llamada directa: n8n devuelve el objeto plano, sin envolver en "data".
+      setResult(
+        directUrl
+          ? { ok: true, message: responseData.message, data: responseData as Record<string, unknown> }
+          : responseData,
+      );
     } catch (error) {
       setResult({
         ok: false,
