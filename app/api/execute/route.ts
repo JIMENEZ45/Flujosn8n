@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// Hasta 60 s: los flujos de n8n suelen tardar más que el timeout por defecto.
+// Tope de la plataforma. Los flujos largos deben responder de inmediato desde
+// n8n (Respond to Webhook temprano) y seguir trabajando en segundo plano.
 export const maxDuration = 60;
 
 const webhookMap: Record<string, string | undefined> = {
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
 
   // Corta la espera antes de que Vercel mate la función por timeout.
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 55_000);
+  const timeout = setTimeout(() => controller.abort(), 58_000);
 
   try {
     const n8nResponse = await fetch(webhookUrl, {
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         message: aborted
-          ? "n8n tardó demasiado en responder (más de 55 s)."
+          ? "n8n no respondió a tiempo. Si el flujo es largo, revisa la ejecución en n8n: probablemente siga corriendo."
           : error instanceof Error
             ? error.message
             : "Error inesperado al contactar n8n.",

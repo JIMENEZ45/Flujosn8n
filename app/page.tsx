@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowRight,
   ArrowUpRight,
   FileJson,
   FileSpreadsheet,
@@ -33,6 +34,8 @@ type Flow = {
   description: string;
   category: string;
   icon: ElementType;
+  /** Color del módulo: define ícono, etiqueta y botón. */
+  accent: "blue" | "purple" | "green" | "orange";
   fields: Field[];
 };
 
@@ -45,6 +48,7 @@ const flows: Flow[] = [
       "Convierte un Google Doc con tests en archivos JSON y entrega la carpeta temporal de Drive.",
     category: "Tests",
     icon: FileJson,
+    accent: "blue",
     fields: [
       {
         key: "googleDocUrl",
@@ -62,6 +66,7 @@ const flows: Flow[] = [
       "Descarga los recursos listados en una hoja de Google Sheets, con opción de dividirlos por unidad.",
     category: "Recursos",
     icon: FolderDown,
+    accent: "purple",
     fields: [
       {
         key: "sheetUrl",
@@ -88,6 +93,7 @@ const flows: Flow[] = [
       "Genera la matriz de importación a partir de la plantilla de la asignatura y sus códigos.",
     category: "Matrices",
     icon: FileSpreadsheet,
+    accent: "green",
     fields: [
       {
         key: "codigos",
@@ -120,6 +126,7 @@ const flows: Flow[] = [
       "Crea las plantillas temáticas a partir de una carpeta principal de Google Drive.",
     category: "Plantillas",
     icon: LayoutTemplate,
+    accent: "orange",
     fields: [
       {
         key: "folderUrl",
@@ -244,15 +251,6 @@ export default function Home() {
 
   return (
     <main className="page-shell">
-      <div className="grid-layer" />
-      <div className="floor-layer" />
-      <div className="aurora aurora-1" />
-      <div className="aurora aurora-2" />
-      <div className="aurora aurora-3" />
-      <div className="sweep" />
-      <div className="scanlines" />
-      <div className="vignette" />
-
       <div className="content">
         <header className="topbar">
           <div className="brand">
@@ -284,13 +282,12 @@ export default function Home() {
         <section className="hero">
           <p className="eyebrow">Automatizaciones</p>
           <h1>
-            Todos tus flujos,
-            <br />
+            Todos tus flujos,{" "}
             <span className="glow-word">en un solo lugar.</span>
           </h1>
           <p className="hero-copy">
-            Selecciona una automatización, completa sus datos y ejecútala sin entrar al editor de
-            n8n. Respuesta en tiempo real, directo desde el navegador.
+            Selecciona una automatización, completa sus datos y ejecútala sin entrar al editor
+            de n8n.
           </p>
 
           <div className="hero-meta">
@@ -298,7 +295,7 @@ export default function Home() {
               Motor <b>n8n</b>
             </span>
             <span className="chip">
-              Runtime <b>Next.js 15</b>
+              Módulos <b>{flows.length}</b>
             </span>
             <span className="chip">
               Estado <b>Operativo</b>
@@ -329,7 +326,7 @@ export default function Home() {
               <button
                 key={flow.id}
                 type="button"
-                className="flow-card"
+                className={`flow-card accent-${flow.accent}`}
                 style={{ animationDelay: `${index * 90}ms` }}
                 onClick={() => openFlow(flow)}
               >
@@ -348,7 +345,7 @@ export default function Home() {
 
                 <span className="open-label">
                   Ejecutar
-                  <ArrowUpRight size={15} />
+                  <ArrowRight size={16} />
                 </span>
               </button>
             );
@@ -367,7 +364,7 @@ export default function Home() {
       {selectedFlow && (
         <div className="modal-backdrop" onMouseDown={closeFlow}>
           <section
-            className="flow-modal"
+            className={`flow-modal accent-${selectedFlow.accent}`}
             role="dialog"
             aria-modal="true"
             aria-labelledby="flow-title"
