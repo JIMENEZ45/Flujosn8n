@@ -139,19 +139,6 @@ const flows: Flow[] = [
   },
 ];
 
-/**
- * Flujos que el navegador llama directamente al webhook de n8n, saltándose
- * la función de Vercel y su límite de 60 s. Requiere que el nodo Webhook
- * tenga CORS habilitado (Options → Allowed Origins).
- */
-const directWebhooks: Record<string, string | undefined> = {
-  // Esta URL es pública de todas formas (el navegador la ejecuta), así que va
-  // aquí directo. Se puede sobrescribir con una variable NEXT_PUBLIC_ si hace falta.
-  "descargar-recursos":
-    process.env.NEXT_PUBLIC_N8N_DESCARGAR_RECURSOS ||
-    "https://auton8n4.americana.edu.co/webhook/descargar-recursos-web",
-};
-
 type ExecutionResult = {
   ok?: boolean;
   demo?: boolean;
@@ -236,22 +223,12 @@ export default function Home() {
       payload[key] = typeof value === "string" ? value.trim() : "";
     });
 
-    const directUrl = directWebhooks[selectedFlow.id];
-
     try {
-      const response = directUrl
-        ? // text/plain evita la petición OPTIONS de sondeo del navegador, que
-          // suele quedar bloqueada por proxies delante de n8n.
-          await fetch(directUrl, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=UTF-8" },
-            body: JSON.stringify(payload),
-          })
-        : await fetch("/api/execute", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ flowId: selectedFlow.id, payload }),
-          });
+      const response = await fetch("/api/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ flowId: selectedFlow.id, payload }),
+      });
 
       let responseData: ExecutionResult;
 
@@ -265,12 +242,7 @@ export default function Home() {
         throw new Error(responseData.message || "No se pudo ejecutar la automatización.");
       }
 
-      // Llamada directa: n8n devuelve el objeto plano, sin envolver en "data".
-      setResult(
-        directUrl
-          ? { ok: true, message: responseData.message, data: responseData as Record<string, unknown> }
-          : responseData,
-      );
+      setResult(responseData);
     } catch (error) {
       setResult({
         ok: false,
