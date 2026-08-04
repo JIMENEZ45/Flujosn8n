@@ -80,7 +80,7 @@ const flows: Flow[] = [
         label: "Dividir recursos por unidad",
         type: "select",
         options: ["Si", "No"],
-        defaultValue: "Si",
+        defaultValue: "No",
         hint: "Este proceso puede tardar varios minutos.",
       },
     ],
