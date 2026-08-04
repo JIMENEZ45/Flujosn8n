@@ -240,9 +240,11 @@ export default function Home() {
 
     try {
       const response = directUrl
-        ? await fetch(directUrl, {
+        ? // text/plain evita la petición OPTIONS de sondeo del navegador, que
+          // suele quedar bloqueada por proxies delante de n8n.
+          await fetch(directUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "text/plain;charset=UTF-8" },
             body: JSON.stringify(payload),
           })
         : await fetch("/api/execute", {
