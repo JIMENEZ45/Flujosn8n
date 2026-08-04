@@ -145,7 +145,11 @@ const flows: Flow[] = [
  * tenga CORS habilitado (Options → Allowed Origins).
  */
 const directWebhooks: Record<string, string | undefined> = {
-  "descargar-recursos": process.env.NEXT_PUBLIC_N8N_DESCARGAR_RECURSOS,
+  // Esta URL es pública de todas formas (el navegador la ejecuta), así que va
+  // aquí directo. Se puede sobrescribir con una variable NEXT_PUBLIC_ si hace falta.
+  "descargar-recursos":
+    process.env.NEXT_PUBLIC_N8N_DESCARGAR_RECURSOS ||
+    "https://auton8n4.americana.edu.co/webhook/descargar-recursos-web",
 };
 
 type ExecutionResult = {
