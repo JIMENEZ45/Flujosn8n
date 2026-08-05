@@ -1,16 +1,23 @@
 "use client";
 
 import {
+  AlertCircle,
   ArrowRight,
   ArrowUpRight,
+  Check,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
   FileJson,
   FileSpreadsheet,
+  FileText,
+  Folder,
   FolderDown,
   LayoutTemplate,
   LoaderCircle,
   Play,
+  RotateCcw,
   Search,
-  Terminal,
   X,
 } from "lucide-react";
 import type { ElementType, FormEvent } from "react";
@@ -80,7 +87,7 @@ const flows: Flow[] = [
         label: "Dividir recursos por unidad",
         type: "select",
         options: ["Si", "No"],
-        defaultValue: "No",
+        defaultValue: "Si",
         hint: "Este proceso puede tardar varios minutos.",
       },
     ],
@@ -257,6 +264,14 @@ export default function Home() {
     typeof result?.data?.folderUrl === "string" ? (result.data.folderUrl as string) : null;
   const totalTests =
     typeof result?.data?.totalTests === "number" ? (result.data.totalTests as number) : null;
+  const folderName =
+    typeof result?.data?.folderName === "string" ? (result.data.folderName as string) : null;
+  const fileName =
+    typeof result?.data?.fileName === "string" ? (result.data.fileName as string) : null;
+  const expiresIn =
+    typeof result?.data?.expiresInMinutes === "number"
+      ? (result.data.expiresInMinutes as number)
+      : null;
 
   return (
     <main className="page-shell">
@@ -264,7 +279,12 @@ export default function Home() {
         <header className="topbar">
           <div className="brand">
             <span className="brand-icon">
-              <Terminal size={20} />
+              <svg viewBox="0 0 64 64" width="18" height="18" aria-hidden="true">
+                <path
+                  d="M12 40.5 C 20 44.5, 30 41, 38.5 33 C 45 26.5, 49 20.5, 52 15.5 C 49.5 24, 45.5 32.5, 38 39.5 C 30 47, 20 49, 12 45.5 Z"
+                  fill="currentColor"
+                />
+              </svg>
             </span>
             <span>
               <span className="brand-name">Equipo de Cargue</span>
@@ -289,14 +309,14 @@ export default function Home() {
         </header>
 
         <section className="hero">
-          <p className="eyebrow">Automatizaciones</p>
+          <p className="eyebrow">Americana · Automatizaciones</p>
           <h1>
-            Todos tus flujos,{" "}
-            <span className="glow-word">en un solo lugar.</span>
+            Equipo de Cargue,{" "}
+            <span className="glow-word">el mejor del bloque.</span>
           </h1>
           <p className="hero-copy">
-            Selecciona una automatización, completa sus datos y ejecútala sin entrar al editor
-            de n8n.
+            Todos nuestros flujos en un solo lugar. Selecciona una automatización, completa sus
+            datos y ejecútala sin entrar al editor de n8n.
           </p>
 
           <div className="hero-meta">
@@ -398,70 +418,168 @@ export default function Home() {
             <h2 id="flow-title">{selectedFlow.name}</h2>
             <p className="modal-copy">{selectedFlow.description}</p>
 
-            <form onSubmit={executeFlow} className="flow-form">
-              {selectedFlow.fields.map((field) => (
-                <label key={field.key}>
-                  <span>{field.label}</span>
+            {!result && (
+              <form onSubmit={executeFlow} className="flow-form">
+                {selectedFlow.fields.map((field) => (
+                  <label key={field.key}>
+                    <span>{field.label}</span>
 
-                  {field.type === "select" ? (
-                    <select
-                      name={field.key}
-                      defaultValue={field.defaultValue || field.options?.[0]}
-                      required
-                    >
-                      {(field.options || []).map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
+                    {field.type === "select" ? (
+                      <select
+                        name={field.key}
+                        defaultValue={field.defaultValue || field.options?.[0]}
+                        required
+                      >
+                        {(field.options || []).map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        name={field.key}
+                        type={field.type || "text"}
+                        placeholder={field.placeholder}
+                        autoComplete="off"
+                        required
+                      />
+                    )}
+
+                    {field.hint && <small className="field-hint">{field.hint}</small>}
+                  </label>
+                ))}
+
+                <button className="execute-button" type="submit" disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <LoaderCircle className="spin" size={18} />
+                      Ejecutando...
+                    </>
                   ) : (
-                    <input
-                      name={field.key}
-                      type={field.type || "text"}
-                      placeholder={field.placeholder}
-                      autoComplete="off"
-                      required
-                    />
+                    <>
+                      <Play size={16} fill="currentColor" />
+                      Ejecutar automatización
+                    </>
                   )}
-
-                  {field.hint && <small className="field-hint">{field.hint}</small>}
-                </label>
-              ))}
-
-              <button className="execute-button" type="submit" disabled={submitting}>
-                {submitting ? (
-                  <>
-                    <LoaderCircle className="spin" size={18} />
-                    Ejecutando...
-                  </>
-                ) : (
-                  <>
-                    <Play size={16} fill="currentColor" />
-                    Ejecutar automatización
-                  </>
-                )}
-              </button>
-            </form>
+                </button>
+              </form>
+            )}
 
             {result && (
               <div
                 className={`result-box ${result.ok === false ? "result-error" : "result-success"}`}
                 role="status"
               >
-                <strong>
-                  {result.ok === false ? "// Error de ejecución" : "// Proceso completado"}
-                </strong>
-                <p>{result.message || "La automatización terminó correctamente."}</p>
+                <div className="result-hero">
+                  <span className="result-hero-icon">
+                    {result.ok === false ? <AlertCircle size={22} /> : <Check size={22} />}
+                  </span>
 
-                {totalTests !== null && <p>Archivos generados: {totalTests}</p>}
+                  <div className="result-hero-text">
+                    <h3>{result.ok === false ? "Error de ejecución" : "Proceso completado"}</h3>
+                    <p>{result.message || "La automatización terminó correctamente."}</p>
+                  </div>
 
-                {folderUrl && (
-                  <a href={folderUrl} target="_blank" rel="noreferrer">
-                    Abrir carpeta de Drive
-                    <ArrowUpRight size={14} />
-                  </a>
+                  <svg className="result-art" viewBox="0 0 96 80" aria-hidden="true">
+                    <circle cx="10" cy="26" r="2.5" />
+                    <circle cx="86" cy="58" r="2" />
+                    <path d="M18 12v5M15.5 14.5h5" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M84 18v5M81.5 20.5h5" strokeWidth="2" strokeLinecap="round" />
+                    <rect
+                      x="30"
+                      y="22"
+                      width="42"
+                      height="36"
+                      rx="7"
+                      fill="none"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M30 29a7 7 0 0 1 7-7h9l4 5h15a7 7 0 0 1 7 7"
+                      fill="none"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M43 40.5l5.5 5.5L59 35"
+                      fill="none"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                {(totalTests !== null || folderName || fileName || expiresIn !== null) && (
+                  <div className="result-body">
+                    <h4>Resumen del proceso</h4>
+
+                    <ul className="result-rows">
+                      {totalTests !== null && (
+                        <li>
+                          <span className="row-icon">
+                            <FileText size={15} />
+                          </span>
+                          <span className="row-label">Archivos generados</span>
+                          <span className="row-value">{totalTests}</span>
+                        </li>
+                      )}
+
+                      {folderName && (
+                        <li>
+                          <span className="row-icon">
+                            <Folder size={15} />
+                          </span>
+                          <span className="row-label">Carpeta</span>
+                          <span className="row-value">{folderName}</span>
+                        </li>
+                      )}
+
+                      {fileName && (
+                        <li>
+                          <span className="row-icon">
+                            <FileText size={15} />
+                          </span>
+                          <span className="row-label">Archivo</span>
+                          <span className="row-value">{fileName}</span>
+                        </li>
+                      )}
+
+                      {expiresIn !== null && (
+                        <li>
+                          <span className="row-icon">
+                            <Clock size={15} />
+                          </span>
+                          <span className="row-label">Se elimina en</span>
+                          <span className="row-value">{expiresIn} minutos</span>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
                 )}
+
+                <div className="result-actions">
+                  {folderUrl && (
+                    <a
+                      className="result-action"
+                      href={folderUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <ExternalLink size={16} />
+                      Abrir en Google Drive
+                    </a>
+                  )}
+
+                  <button
+                    type="button"
+                    className="result-again"
+                    onClick={() => setResult(null)}
+                  >
+                    <RotateCcw size={15} />
+                    Ejecutar de nuevo
+                  </button>
+                </div>
               </div>
             )}
           </section>
