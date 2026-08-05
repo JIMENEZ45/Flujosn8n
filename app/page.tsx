@@ -23,6 +23,21 @@ import {
 import type { ElementType, FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+/* ============================================================
+   LOGO — cambia solo esta línea para cambiar la marca.
+   Es un "path" de SVG dibujado sobre un lienzo de 64x64.
+   Si lo cambias aquí, cambia también app/icon.svg (el ícono
+   de la pestaña del navegador) para que coincidan.
+
+   Otras formas listas para pegar:
+   - Estrella 5 puntas: la actual
+   - Rayo:    "M36 6 18 36h12l-4 22 20-32H34z"
+   - Corazón: "M32 56S8 42 8 25a13 13 0 0 1 24-7 13 13 0 0 1 24 7c0 17-24 31-24 31z"
+   - Trazo:   "M12 40.5C20 44.5 30 41 38.5 33 45 26.5 49 20.5 52 15.5 49.5 24 45.5 32.5 38 39.5 30 47 20 49 12 45.5Z"
+   ============================================================ */
+const LOGO_PATH =
+  "M32 6l7.6 15.4 17 2.5-12.3 12 2.9 16.9L32 44.8 16.8 52.8l2.9-16.9-12.3-12 17-2.5z";
+
 type Field = {
   key: string;
   label: string;
@@ -279,11 +294,8 @@ export default function Home() {
         <header className="topbar">
           <div className="brand">
             <span className="brand-icon">
-              <svg viewBox="0 0 64 64" width="18" height="18" aria-hidden="true">
-                <path
-                  d="M12 40.5 C 20 44.5, 30 41, 38.5 33 C 45 26.5, 49 20.5, 52 15.5 C 49.5 24, 45.5 32.5, 38 39.5 C 30 47, 20 49, 12 45.5 Z"
-                  fill="currentColor"
-                />
+              <svg viewBox="0 0 64 64" width="19" height="19" aria-hidden="true">
+                <path d={LOGO_PATH} fill="currentColor" />
               </svg>
             </span>
             <span>
