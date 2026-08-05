@@ -13,7 +13,10 @@ import {
   FileText,
   Folder,
   FolderDown,
+  Hash,
+  Info,
   LayoutTemplate,
+  Link2,
   LoaderCircle,
   Play,
   RotateCcw,
@@ -58,6 +61,8 @@ type Flow = {
   icon: ElementType;
   /** Color del módulo: define ícono, etiqueta y botón. */
   accent: "blue" | "purple" | "green" | "orange";
+  /** Línea al pie del formulario: qué entrega el flujo. */
+  footerNote: string;
   fields: Field[];
 };
 
@@ -71,6 +76,8 @@ const flows: Flow[] = [
     category: "Tests",
     icon: FileJson,
     accent: "blue",
+    footerNote:
+      "Se creará y entregará una carpeta temporal en tu Google Drive con los archivos JSON generados.",
     fields: [
       {
         key: "googleDocUrl",
@@ -89,6 +96,8 @@ const flows: Flow[] = [
     category: "Recursos",
     icon: FolderDown,
     accent: "purple",
+    footerNote:
+      "Los recursos se copiarán a una carpeta nueva en Google Drive, disponible por 30 minutos.",
     fields: [
       {
         key: "sheetUrl",
@@ -116,6 +125,8 @@ const flows: Flow[] = [
     category: "Matrices",
     icon: FileSpreadsheet,
     accent: "green",
+    footerNote:
+      "Se generará un archivo CSV listo para importar, guardado en tu Google Drive.",
     fields: [
       {
         key: "codigos",
@@ -149,6 +160,8 @@ const flows: Flow[] = [
     category: "Plantillas",
     icon: LayoutTemplate,
     accent: "orange",
+    footerNote:
+      "Se creará la plantilla temática en Google Drive a partir de la carpeta indicada.",
     fields: [
       {
         key: "folderUrl",
@@ -449,16 +462,26 @@ export default function Home() {
                         ))}
                       </select>
                     ) : (
-                      <input
-                        name={field.key}
-                        type={field.type || "text"}
-                        placeholder={field.placeholder}
-                        autoComplete="off"
-                        required
-                      />
+                      <span className="input-wrap">
+                        <span className="input-icon">
+                          {field.type === "url" ? <Link2 size={17} /> : <Hash size={17} />}
+                        </span>
+                        <input
+                          name={field.key}
+                          type={field.type || "text"}
+                          placeholder={field.placeholder}
+                          autoComplete="off"
+                          required
+                        />
+                      </span>
                     )}
 
-                    {field.hint && <small className="field-hint">{field.hint}</small>}
+                    {field.hint && (
+                      <small className="field-hint">
+                        <Info size={15} />
+                        {field.hint}
+                      </small>
+                    )}
                   </label>
                 ))}
 
@@ -475,6 +498,13 @@ export default function Home() {
                     </>
                   )}
                 </button>
+
+                <p className="form-footer">
+                  <span className="form-footer-icon">
+                    <Folder size={16} />
+                  </span>
+                  {selectedFlow.footerNote}
+                </p>
               </form>
             )}
 

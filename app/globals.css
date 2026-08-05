@@ -466,7 +466,7 @@ select {
 
 .flow-modal {
   position: relative;
-  width: min(520px, 100%);
+  width: min(560px, 100%);
   max-height: calc(100vh - 40px);
   overflow: auto;
   padding: 34px 32px 32px;
@@ -500,32 +500,33 @@ select {
 .modal-icon {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 18px;
-  color: var(--accent);
-  border-radius: 13px;
-  background: rgba(43, 95, 143, 0.1);
+  width: 54px;
+  height: 54px;
+  margin-bottom: 20px;
+  color: var(--tone, var(--accent));
+  border-radius: 14px;
+  background: var(--tone-soft, rgba(43, 95, 143, 0.1));
 }
 
 .flow-modal .eyebrow {
-  margin-bottom: 6px;
-  color: var(--muted-soft);
-  font-size: 13px;
+  color: var(--tone, var(--accent));
+  margin-bottom: 8px;
+  color: var(--tone, var(--accent));
+  font-size: 14px;
   font-weight: 500;
 }
 
 .flow-modal h2 {
   margin: 0;
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 600;
   letter-spacing: -0.025em;
 }
 
 .modal-copy {
-  margin: 8px 0 26px;
+  margin: 10px 0 28px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
@@ -543,14 +544,14 @@ select {
 
 .flow-form label > span {
   color: var(--text);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .flow-form input,
 .flow-form select {
   width: 100%;
-  height: 46px;
+  height: 52px;
   padding: 0 14px;
   border: 1px solid var(--line-strong);
   border-radius: 11px;
@@ -578,38 +579,75 @@ select {
   -webkit-appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
     linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-  background-position: calc(100% - 19px) 21px, calc(100% - 14px) 21px;
+  background-position: calc(100% - 19px) 24px, calc(100% - 14px) 24px;
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
 }
 
 .field-hint {
-  color: var(--muted-soft);
-  font-size: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
   line-height: 1.45;
+}
+
+.field-hint svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--tone, var(--accent));
+}
+
+/* campo con ícono a la izquierda */
+
+.input-wrap {
+  position: relative;
+  display: block;
+}
+
+.input-icon {
+  position: absolute;
+  top: 0;
+  left: 15px;
+  display: grid;
+  height: 52px;
+  align-items: center;
+  color: var(--muted-soft);
+  pointer-events: none;
+}
+
+.input-wrap input {
+  padding-left: 45px;
+}
+
+.input-wrap:focus-within .input-icon {
+  color: var(--tone, var(--accent));
 }
 
 .execute-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 46px;
-  margin-top: 6px;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 10px;
   padding: 0 22px;
   border: 0;
-  border-radius: 980px;
+  border-radius: 14px;
   color: #fff;
   cursor: pointer;
-  background: var(--accent);
-  font-size: 15px;
-  font-weight: 500;
+  background: var(--tone, var(--accent));
+  font-size: 17px;
+  font-weight: 600;
   letter-spacing: -0.01em;
-  transition: background 160ms ease, transform 160ms ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+  transition: filter 160ms ease, transform 160ms ease;
 }
 
 .execute-button:hover:not(:disabled) {
-  background: var(--accent-hover);
+  filter: brightness(1.08);
 }
 
 .execute-button:active:not(:disabled) {
@@ -1092,4 +1130,29 @@ select {
   .result-hero-text p {
     max-width: none;
   }
+}
+
+/* ---------- Pie del formulario ---------- */
+
+.form-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 22px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.form-footer-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  color: var(--tone, var(--accent));
+  border-radius: 10px;
+  background: var(--tone-soft, rgba(43, 95, 143, 0.1));
 }
