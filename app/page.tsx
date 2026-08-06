@@ -24,7 +24,7 @@ import {
   X,
 } from "lucide-react";
 import type { ElementType, FormEvent } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /* ============================================================
    LOGO — cambia solo esta línea para cambiar la marca.
@@ -61,6 +61,8 @@ type Flow = {
   icon: ElementType;
   /** Color del módulo: define ícono, etiqueta y botón. */
   accent: "blue" | "purple" | "green" | "orange";
+  /** Texto del botón: la acción concreta, no "Ejecutar". */
+  action: string;
   /** Línea al pie del formulario: qué entrega el flujo. */
   footerNote: string;
   fields: Field[];
@@ -76,6 +78,7 @@ const flows: Flow[] = [
     category: "Tests",
     icon: FileJson,
     accent: "blue",
+    action: "Generar tests",
     footerNote:
       "Se creará y entregará una carpeta temporal en tu Google Drive con los archivos JSON generados.",
     fields: [
@@ -96,6 +99,7 @@ const flows: Flow[] = [
     category: "Recursos",
     icon: FolderDown,
     accent: "purple",
+    action: "Descargar recursos",
     footerNote:
       "Los recursos se copiarán a una carpeta nueva en Google Drive, disponible por 30 minutos.",
     fields: [
@@ -125,6 +129,7 @@ const flows: Flow[] = [
     category: "Matrices",
     icon: FileSpreadsheet,
     accent: "green",
+    action: "Generar matriz",
     footerNote:
       "Se generará un archivo CSV listo para importar, guardado en tu Google Drive.",
     fields: [
@@ -160,6 +165,7 @@ const flows: Flow[] = [
     category: "Plantillas",
     icon: LayoutTemplate,
     accent: "orange",
+    action: "Generar plantilla",
     footerNote:
       "Se creará la plantilla temática en Google Drive a partir de la carpeta indicada.",
     fields: [
@@ -182,19 +188,44 @@ type ExecutionResult = {
 };
 
 export default function Home() {
-  const [query, setQuery] = useState("");
   const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ExecutionResult | null>(null);
-  const [clock, setClock] = useState("--:--:--");
+  const glowRef = useRef<HTMLDivElement>(null);
   const [elapsed, setElapsed] = useState(0);
 
-  // Reloj HUD (solo en cliente para evitar errores de hidratación)
+  // Luz tenue que sigue al cursor. Se mueve por CSS vars para no re-renderizar.
   useEffect(() => {
-    const tick = () => setClock(new Date().toLocaleTimeString("es-CO", { hour12: false }));
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
+    const fino = window.matchMedia("(pointer: fine)").matches;
+    const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fino || reducido) return;
+
+    let frame = 0;
+
+    const mover = (event: MouseEvent) => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const el = glowRef.current;
+        if (!el) return;
+        el.style.setProperty("--x", `${event.clientX}px`);
+        el.style.setProperty("--y", `${event.clientY}px`);
+        el.style.opacity = "1";
+      });
+    };
+
+    const salir = () => {
+      if (glowRef.current) glowRef.current.style.opacity = "0";
+    };
+
+    window.addEventListener("mousemove", mover, { passive: true });
+    document.addEventListener("mouseleave", salir);
+
+    return () => {
+      window.removeEventListener("mousemove", mover);
+      document.removeEventListener("mouseleave", salir);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   // Cronómetro visible mientras corre un flujo largo
@@ -204,17 +235,6 @@ export default function Home() {
     const id = setInterval(() => setElapsed((value) => value + 1), 1000);
     return () => clearInterval(id);
   }, [submitting]);
-
-  const filteredFlows = useMemo(() => {
-    const value = query.trim().toLowerCase();
-    if (!value) return flows;
-
-    return flows.filter((flow) =>
-      [flow.name, flow.description, flow.category, flow.code].some((text) =>
-        text.toLowerCase().includes(value),
-      ),
-    );
-  }, [query]);
 
   const closeFlow = useCallback(() => {
     if (submitting) return;
@@ -303,6 +323,7 @@ export default function Home() {
 
   return (
     <main className="page-shell">
+      <div className="cursor-glow" ref={glowRef} aria-hidden="true" />
       <div className="content">
         <header className="topbar">
           <div className="brand">
@@ -317,63 +338,24 @@ export default function Home() {
             </span>
           </div>
 
-          <div className="hud-stats">
-            <div className="hud-stat">
-              <span>Flujos</span>
-              <strong>{String(flows.length).padStart(2, "0")}</strong>
-            </div>
-            <div className="hud-stat">
-              <span>Hora local</span>
-              <strong>{clock}</strong>
-            </div>
-            <span className="status-pill">
-              <span className="status-dot" />
-              Sistema en línea
-            </span>
-          </div>
+          <span className="status-pill">
+            <span className="status-dot" />
+            En línea
+          </span>
         </header>
 
         <section className="hero">
-          <p className="eyebrow">Americana · Automatizaciones</p>
+          <p className="eyebrow">Americana</p>
           <h1>
             Equipo de Cargue,{" "}
             <span className="glow-word">el mejor del bloque.</span>
           </h1>
-          <p className="hero-copy">
-            Todos nuestros flujos en un solo lugar. Selecciona una automatización, completa sus
-            datos y ejecútala sin entrar al editor de n8n.
-          </p>
+          <p className="hero-copy">Nuestras automatizaciones, en un solo lugar.</p>
 
-          <div className="hero-meta">
-            <span className="chip">
-              Motor <b>n8n</b>
-            </span>
-            <span className="chip">
-              Módulos <b>{flows.length}</b>
-            </span>
-            <span className="chip">
-              Estado <b>Operativo</b>
-            </span>
-          </div>
         </section>
 
-        <div className="toolbar">
-          <div className="search-box">
-            <Search size={18} />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar automatización..."
-              aria-label="Buscar automatización"
-            />
-          </div>
-          <span className="count-label">
-            {filteredFlows.length} / {flows.length} módulos
-          </span>
-        </div>
-
         <section className="flow-grid" aria-label="Automatizaciones disponibles">
-          {filteredFlows.map((flow, index) => {
+          {flows.map((flow, index) => {
             const Icon = flow.icon;
 
             return (
@@ -381,24 +363,20 @@ export default function Home() {
                 key={flow.id}
                 type="button"
                 className={`flow-card accent-${flow.accent}`}
-                style={{ animationDelay: `${index * 90}ms` }}
+                style={{ animationDelay: `${index * 80}ms` }}
                 onClick={() => openFlow(flow)}
               >
-                <div className="flow-card-header">
-                  <span className="flow-icon">
-                    <Icon size={24} />
-                  </span>
-                  <span className="category">{flow.category}</span>
-                </div>
+                <span className="flow-icon">
+                  <Icon size={26} strokeWidth={1.75} />
+                </span>
 
-                <div>
-                  <p className="flow-id">// {flow.code}</p>
-                  <h2>{flow.name}</h2>
-                  <p>{flow.description}</p>
-                </div>
+                <span className="category">{flow.category}</span>
+
+                <h2>{flow.name}</h2>
+                <p>{flow.description}</p>
 
                 <span className="open-label">
-                  Ejecutar
+                  {flow.action}
                   <ArrowRight size={16} />
                 </span>
               </button>
@@ -406,13 +384,7 @@ export default function Home() {
           })}
         </section>
 
-        {filteredFlows.length === 0 && (
-          <div className="empty-state">
-            &gt; Sin resultados para &quot;{query}&quot;. Intenta con otro término.
-          </div>
-        )}
-
-        <p className="footer-note">Equipo de Cargue · Interfaz de control para n8n</p>
+        <p className="footer-note">Universidad Americana</p>
       </div>
 
       {selectedFlow && (
@@ -438,7 +410,8 @@ export default function Home() {
             </div>
 
             <p className="eyebrow">
-              {selectedFlow.code} · {selectedFlow.category}
+              {selectedFlow.category}
+              <span className="flow-code">{selectedFlow.code}</span>
             </p>
             <h2 id="flow-title">{selectedFlow.name}</h2>
             <p className="modal-copy">{selectedFlow.description}</p>
@@ -494,7 +467,7 @@ export default function Home() {
                   ) : (
                     <>
                       <Play size={16} fill="currentColor" />
-                      Ejecutar automatización
+                      {selectedFlow.action}
                     </>
                   )}
                 </button>
