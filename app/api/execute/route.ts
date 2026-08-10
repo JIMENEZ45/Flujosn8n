@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,6 +25,19 @@ function readMessage(data: unknown, fallback: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  // Nadie ejecuta automatizaciones sin sesión iniciada.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { ok: false, message: "Debes iniciar sesión para ejecutar automatizaciones." },
+      { status: 401 },
+    );
+  }
+
   let body: JsonRecord;
 
   try {

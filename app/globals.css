@@ -8,7 +8,7 @@
 
 :root {
   --bg: #ffffff;
-  --bg-soft: #f5f5f7;
+  --bg-soft: #f4f4f5;
   --surface: #ffffff;
   --text: #1d1d1f;
   --muted: #6e6e73;
@@ -72,40 +72,16 @@ select {
   background: var(--bg-soft);
 }
 
-/* Foto del equipo, fija detrás de todo */
+/* Espiral de fondo, fija */
 .page-shell::before {
-  position: fixed;
-  z-index: -2;
-  content: "";
-  inset: 0;
-  background-image: url("/equipo.jpg");
-  background-position: center;
-  background-size: cover;
-  background-attachment: fixed;
-}
-
-/* Velo claro: mantiene la foto visible pero deja leer el texto */
-.page-shell::after {
   position: fixed;
   z-index: -1;
   content: "";
   inset: 0;
-  backdrop-filter: blur(1.5px) saturate(108%);
-  -webkit-backdrop-filter: blur(1.5px) saturate(108%);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(245, 245, 247, 0.74) 0%,
-      rgba(245, 245, 247, 0.44) 38%,
-      rgba(245, 245, 247, 0.5) 62%,
-      rgba(245, 245, 247, 0.82) 100%
-    );
-}
-
-.content {
-  width: min(1060px, calc(100% - 40px));
-  margin: 0 auto;
-  padding: 0 0 96px;
+  background-image: url("/fondo.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 /* ---------- Barra superior ---------- */
@@ -207,15 +183,14 @@ select {
 /* ---------- Encabezado ---------- */
 
 .hero {
-  position: relative;
-  max-width: 640px;
-  margin: 56px 0 40px;
-  padding: 28px 32px 26px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  max-width: 660px;
+  margin: 60px 0 44px;
+  padding: 30px 34px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: saturate(180%) blur(16px);
-  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
   box-shadow: var(--shadow-sm);
 }
 
@@ -319,7 +294,7 @@ select {
   padding: 5px 11px;
   border-radius: 980px;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface);
   font-size: 13px;
   white-space: nowrap;
 }
@@ -338,14 +313,14 @@ select {
   gap: 0;
   min-height: 250px;
   padding: 26px 26px 22px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: var(--radius-lg);
   color: inherit;
   text-align: left;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: saturate(140%) blur(12px);
-  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
   box-shadow: var(--shadow-sm);
   transition:
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -363,7 +338,7 @@ select {
 .flow-card:focus-visible {
   transform: translateY(-3px);
   outline: none;
-  background: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.4);
   box-shadow: var(--shadow-md);
 }
 
@@ -420,7 +395,7 @@ select {
 
 .flow-card p {
   margin: 0;
-  color: #34343a;
+  color: #3f3f46;
   font-size: 15px;
   line-height: 1.5;
 }
@@ -449,9 +424,7 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: var(--radius);
   color: var(--text);
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: saturate(140%) blur(12px);
-  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  background: var(--surface);
   font-size: 15px;
   text-align: center;
 }
@@ -671,11 +644,10 @@ select {
 }
 
 .footer-note {
-  margin-top: 56px;
-  padding: 14px 18px;
-  border-radius: 980px;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.8);
+  margin-top: 64px;
+  padding: 20px;
+  border-top: 1px solid var(--line);
+  color: var(--muted-soft);
   font-size: 12px;
   text-align: center;
 }
@@ -1375,4 +1347,368 @@ body::-webkit-scrollbar-thumb:hover {
   .cursor-glow {
     display: none;
   }
+}
+
+/* ---------- Usuario y rol ---------- */
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 13px 4px 5px;
+  border: 1px solid var(--line);
+  border-radius: 980px;
+  background: var(--surface);
+}
+
+.user-avatar {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  color: #fff;
+  border-radius: 999px;
+  background: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.user-role {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.user-role[data-rol="Administrador"] {
+  color: #2b5f8f;
+}
+
+.user-role[data-rol="Editor"] {
+  color: #6d28d9;
+}
+
+.user-role[data-rol="Invitado"] {
+  color: var(--muted);
+}
+
+/* ---------- Sesión: login y registro ---------- */
+
+.auth-shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 32px 24px;
+  isolation: isolate;
+  background: var(--bg-soft);
+}
+
+/* Foto del equipo a pantalla completa */
+.auth-foto {
+  position: fixed;
+  z-index: -2;
+  inset: 0;
+}
+
+.auth-foto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Velo para que la tarjeta se lea sobre la foto */
+.auth-foto::after {
+  position: absolute;
+  content: "";
+  inset: 0;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  background: linear-gradient(
+    200deg,
+    rgba(16, 24, 38, 0.55),
+    rgba(16, 24, 38, 0.68)
+  );
+}
+
+.auth-foto-texto {
+  position: fixed;
+  bottom: 32px;
+  left: 40px;
+  z-index: -1;
+  max-width: 30ch;
+  color: #fff;
+}
+
+.auth-foto-texto h2 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.55);
+}
+
+.auth-foto-texto p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.9;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 780px) {
+  .auth-foto-texto {
+    display: none;
+  }
+}
+
+.auth-card {
+  width: min(420px, 100%);
+  padding: 34px 32px 30px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: saturate(130%) blur(26px);
+  -webkit-backdrop-filter: saturate(140%) blur(22px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  animation: sheetIn 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.auth-card h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.auth-copy {
+  margin: 8px 0 26px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.auth-error,
+.auth-ok {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 2px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.auth-error {
+  color: var(--red);
+  background: var(--red-bg);
+}
+
+.auth-ok {
+  color: var(--green);
+  background: var(--green-bg);
+}
+
+.auth-error svg,
+.auth-ok svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.auth-alt {
+  margin: 24px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.auth-alt a {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-alt a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Zona de usuario en la barra ---------- */
+
+.user-zone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 980px;
+  color: var(--muted);
+  cursor: pointer;
+  background: var(--surface);
+  font-size: 13px;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.logout-button:hover {
+  color: var(--red);
+  background: var(--red-bg);
+}
+
+@media (max-width: 620px) {
+  .logout-button span {
+    display: none;
+  }
+
+  .logout-button {
+    padding: 8px 10px;
+  }
+}
+
+/* ---------- Login sobre la foto: texto claro ---------- */
+
+.auth-card h1,
+.auth-card .brand-name {
+  color: #fff;
+}
+
+.auth-card .brand-sub,
+.auth-card .auth-copy,
+.auth-card .auth-alt,
+.auth-card .field-hint {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.auth-card .brand-icon {
+  color: #16202e;
+  background: #fff;
+}
+
+.auth-card .auth-brand,
+.auth-card .auth-alt {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.auth-card .flow-form label > span {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.auth-card .input-wrap {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.auth-card .input-wrap:focus-within {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
+}
+
+.auth-card .input-wrap input {
+  color: #fff;
+}
+
+.auth-card .input-wrap input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.auth-card .input-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.auth-card .execute-button {
+  color: #16202e;
+  background: #fff;
+}
+
+.auth-card .execute-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.auth-card .auth-alt a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.auth-card .auth-error {
+  color: #ffdad6;
+  background: rgba(179, 38, 30, 0.42);
+}
+
+.auth-card .auth-ok {
+  color: #d7f5e3;
+  background: rgba(18, 161, 80, 0.34);
+}
+
+/* ---------- Campos del login: píldora traslúcida ---------- */
+
+.auth-card .input-wrap {
+  height: 52px;
+  padding-right: 8px;
+  border-radius: 980px;
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.auth-card .input-wrap:focus-within {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.auth-card .input-icon {
+  margin-left: 6px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.auth-card .flow-form label > span {
+  padding-left: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.auth-card .field-hint {
+  padding-left: 18px;
+}
+
+.auth-card .execute-button {
+  height: 52px;
+  border-radius: 980px;
+}
+
+/* Ojo para mostrar la contraseña */
+.ver-password {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  background: transparent;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.ver-password:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
 }
