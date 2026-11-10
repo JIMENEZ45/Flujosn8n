@@ -32,15 +32,25 @@ create policy "cada quien edita su nombre"
   with check (auth.uid() = id);
 
 -- Los administradores ven todos los perfiles.
+-- Se usa una función security definer: consultar `perfiles` dentro de su propia
+-- política provocaría "infinite recursion detected in policy".
+create or replace function public.es_administrador()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.perfiles
+    where id = auth.uid() and rol = 'Administrador'
+  );
+$$;
+
 drop policy if exists "el administrador ve todo" on public.perfiles;
 create policy "el administrador ve todo"
   on public.perfiles for select
-  using (
-    exists (
-      select 1 from public.perfiles p
-      where p.id = auth.uid() and p.rol = 'Administrador'
-    )
-  );
+  using (public.es_administrador());
 
 -- Nota: el rol NO se puede cambiar desde la aplicación a propósito.
 -- Se asigna desde este panel de SQL (ver paso 5).
