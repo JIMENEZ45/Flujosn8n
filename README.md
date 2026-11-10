@@ -3,30 +3,13 @@
 Interfaz web (Next.js 15 + React 19) para ejecutar flujos de n8n desde el navegador,
 sin abrir el editor. Diseño tipo HUD futurista.
 
-**Stack:** Next.js 15 · React 19 · TypeScript · Tailwind CSS · Supabase (auth + PostgreSQL) · n8n
-
-**Qué incluye**
-
-- Inicio de sesión y registro con Supabase; nadie ejecuta flujos sin sesión.
-- Roles (`Administrador`, `Editor`, `Invitado`) con seguridad a nivel de fila (RLS).
-- Cuatro flujos: generar tests JSON, descarga de recursos, matriz de importación CSV y plantillas temáticas.
-- Modo demo cuando un webhook no está configurado.
-
----
-
-## 0. Base de datos (Supabase)
-
-Pega el contenido de `supabase.sql` en **Supabase → SQL Editor → Run**. Crea la tabla
-`perfiles`, sus políticas de seguridad y el trigger que crea el perfil al registrarse.
-Al final del archivo hay una línea comentada para volverte administrador.
-
 ---
 
 ## 1. Probar en tu computador
 
 ```bash
 npm install
-cp .env.example .env.local   # y llena Supabase y los webhooks
+cp .env.example .env.local   # y llena los webhooks
 npm run dev
 ```
 
@@ -77,12 +60,9 @@ En Vercel → Project → **Settings → Environment Variables**:
 
 | Variable | Descripción |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | URL de tu proyecto en Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública (anon) de Supabase |
-| `N8N_WEBHOOK_AUT_TESTS` | Webhook de "Generar tests JSON" |
-| `N8N_WEBHOOK_DESCARGAR_RECURSOS` | Webhook de "Descarga de recursos" |
-| `N8N_WEBHOOK_MATRIZ_CSV` | Webhook de "Matriz de importación CSV" |
-| `N8N_WEBHOOK_PLANTILLAS` | Webhook de "Generador de plantillas temáticas" |
+| `N8N_WEBHOOK_AUT_TESTS` | URL de producción del webhook de "Generar tests JSON" |
+| `N8N_WEBHOOK_COURSE_RESOURCES` | Webhook de "Procesar recursos" |
+| `N8N_WEBHOOK_COMPARE_DOCUMENTS` | Webhook de "Comparar documentos" |
 | `N8N_SHARED_SECRET` | (Opcional) misma clave del Header Auth en n8n |
 
 Si una variable queda vacía, ese flujo responde en **modo demo** en vez de romperse.
@@ -107,7 +87,7 @@ Después de agregar variables hay que hacer **Redeploy**.
 
 ## 5. Agregar un flujo nuevo
 
-1. En `app/panel.tsx`, añade un objeto al arreglo `flows` (id, código, nombre, campos).
+1. En `app/page.tsx`, añade un objeto al arreglo `flows` (id, código, nombre, campos).
 2. En `app/api/execute/route.ts`, agrega la entrada correspondiente en `webhookMap`.
 3. Crea la variable de entorno con la URL del webhook.
 
@@ -118,13 +98,9 @@ Después de agregar variables hay que hacer **Redeploy**.
 ```
 app/
   api/execute/route.ts   → puente seguro hacia n8n (las URLs nunca llegan al navegador)
-  auth/acciones.ts       → login, registro y cierre de sesión
-  login/ · registro/     → pantallas de acceso
-  panel.tsx              → tarjetas, buscador y modal de ejecución
-  page.tsx · layout.tsx · globals.css
-lib/supabase/            → clientes de Supabase (navegador, servidor, middleware)
-middleware.ts            → protege las rutas: sin sesión no se entra al panel
-supabase.sql             → tablas, seguridad por filas y roles
+  globals.css            → tema HUD futurista
+  layout.tsx
+  page.tsx               → tarjetas, buscador y modal de ejecución
 preview.html             → vista rápida del diseño (ábrelo con doble clic)
 ```
 
